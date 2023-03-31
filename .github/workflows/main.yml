@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gcc-version: [4.9.0] # 在这里指定GCC版本号
+        gcc-version: [8.5.0] # 在这里指定GCC版本号
 
     steps:
     - name: Checkout code
