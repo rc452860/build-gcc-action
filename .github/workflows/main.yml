@@ -1,0 +1,38 @@
+name: Build GCC
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-gcc:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        gcc-version: [4.9.0] # 在这里指定GCC版本号
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential texinfo bison flex libgmp-dev libmpfr-dev libmpc-dev
+
+    - name: Build GCC
+      run: |
+        wget https://ftp.gnu.org/gnu/gcc/gcc-${{ matrix.gcc-version }}/gcc-${{ matrix.gcc-version }}.tar.gz
+        tar -xzf gcc-${{ matrix.gcc-version }}.tar.gz
+        cd gcc-${{ matrix.gcc-version }}
+        ls
+        ./contrib/download_prerequisites
+        cd ..
+        mkdir gcc-build-${{ matrix.gcc-version }}
+        cd gcc-build-${{ matrix.gcc-version }}
+        ../gcc-${{ matrix.gcc-version }}/configure --disable-multilib --disable-bootstrap --enable-languages=c,c++ --enable-threads=posix
+        make -j$(nproc)
+        sudo make install
+
+    - name: Test GCC
+      run: gcc --version
